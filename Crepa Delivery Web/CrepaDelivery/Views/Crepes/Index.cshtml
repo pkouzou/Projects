@@ -1,0 +1,74 @@
+﻿@model IEnumerable<CrepaDelivery.Models.Crepe>
+
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/Scripts/bootstrap")
+@Styles.Render("~/Content/css")
+
+<style>
+    #myTable tbody tr:nth-child(even) td {
+        background-color: #e3eaf4 !important;
+    }
+
+    #myTable tbody tr:nth-child(odd) td {
+        background-color: #bcd8ff !important;
+    }
+
+ 
+</style>
+
+<script>
+
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Greek.json"
+            }
+        });
+    });
+
+</script>
+
+<a href="@Url.Action("Create", "Crepes")" class="pull-right"><span class='glyphicon glyphicon-plus-sign fa-lg'></span>Προσθήκη κρέπας</a>
+
+<hr>
+
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NormalPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.XLPrice)
+            </th>
+            <th>Ενέργεια</th>
+        </tr>
+     </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NormalPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.XLPrice)
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", "Crepes",  new { id = item.ID })"><span class='glyphicon glyphicon-edit fa-lg' title="Επεξεργασία"></span></a> | 
+                    <a href="@Url.Action("Details", "Crepes",  new { id = item.ID })"><span class='glyphicon glyphicon-info-sign fa-lg' title="Λεπτομέρειες"></span></a> |
+                    <a href="@Url.Action("Delete", "Crepes",  new { id = item.ID })"><span class='glyphicon glyphicon-trash fa-lg' title="Διαγραφή"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

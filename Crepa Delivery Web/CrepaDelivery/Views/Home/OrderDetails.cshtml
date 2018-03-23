@@ -1,0 +1,94 @@
+﻿@model CrepaDelivery.Models.OrderModel
+
+<div>
+    <h3>Λεπτομέρειες Παραγγελίας</h3>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FullName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DeliverEmail)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DeliverEmail)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalCourtPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TotalCourtPrice) &euro;
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Completed)
+        </dt>
+
+        
+        @if (Model.Completed == 0)
+        {
+            <dd>
+                Εκκρεμεί
+            </dd>
+        }
+        else
+        {
+            <dd>
+                Ολοκληρώθηκε
+            </dd>
+        }
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrderDate)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Πίσω στην λίστα", "OrderHistory")
+</p>
+

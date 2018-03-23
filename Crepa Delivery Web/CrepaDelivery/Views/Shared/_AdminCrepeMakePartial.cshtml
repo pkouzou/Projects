@@ -1,0 +1,47 @@
+﻿@using CrepaDelivery.Models.Helpers;
+@using CrepaDelivery.Models;
+@model CrepeMakePartialViewModel
+
+@{
+    Layout = null;
+}
+
+<script>
+    function ingredientClicked(ingredientName, price) {
+        if (lastRadioButtonChecked === ""){
+            alert("Δημιουργήστε κρέπα πρώτα");
+            return;
+        }
+
+        var crepeCounter = lastRadioButtonChecked.split("_")[1];
+        addIngredientToCrepe(crepeCounter, ingredientName, price);
+    }
+</script>
+
+<div class="row">
+
+    @{
+        int ingredientCounter = 0;
+        string listItemID = " ";
+        foreach (string key in Model.IngredientsDictionary.Keys)
+        {
+            <div class="col-md-4">
+                <h2>@key</h2>
+                <ul class="list-group">
+                    @foreach (Ingredient ingredient in Model.IngredientsDictionary[key])
+                    {
+                        listItemID = Model.CrepeCategoryID + "ingredient" + ingredientCounter;
+                        <li class="list-group-item">
+
+                            <i class="fa fa-plus-square fa-lg" onclick="ingredientClicked('@ingredient.Name', @ingredient.Price)"></i>
+                            <span id=@listItemID value=@ingredient.Name> @ingredient.Name</span>
+                            <span class="pull-right">@ingredient.Price&#8364</span>
+                        </li>
+                        ingredientCounter += 1;
+                    }
+                </ul>
+            </div>
+        }
+    }
+
+</div>

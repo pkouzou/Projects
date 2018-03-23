@@ -1,0 +1,70 @@
+﻿@model IEnumerable<CrepaDelivery.Models.SoftDrink>
+
+<style>
+    #myTable tbody tr:nth-child(even) td {
+        background-color: #e3eaf4 !important;
+    }
+
+    #myTable tbody tr:nth-child(odd) td {
+        background-color: #bcd8ff !important;
+    }
+</style>
+
+@Scripts.Render("~/bundles/jquery")
+
+<script>
+
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Greek.json"
+            }
+        });
+    });
+
+</script>
+
+<a href="@Url.Action("Create", "SoftDrink")" class="pull-right"><span class='glyphicon glyphicon-plus-sign fa-lg'></span>Προσθήκη αναψυκτικού</a>
+
+<hr>
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                Ενέργεια
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", "SoftDrink",  new { id = item.ID })"><span class='glyphicon glyphicon-edit fa-lg' title="Επεξεργασία"></span></a> |
+                    <a href="@Url.Action("Details", "SoftDrink",  new { id = item.ID })"><span class='glyphicon glyphicon-info-sign fa-lg' title="Λεπτομέρειες"></span></a> |
+                    <a href="@Url.Action("Delete", "SoftDrink",  new { id = item.ID })"><span class='glyphicon glyphicon-trash fa-lg' title="Διαγραφή"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>

@@ -1,0 +1,75 @@
+﻿@using CrepaDelivery.Models;
+
+@model List<OrderModel>
+
+
+@Scripts.Render("~/bundles/jquery")
+
+<style>
+#courtItemsTable tbody tr:nth-child(even) td{
+    background-color: #e3eaf4 !important;
+}
+
+#courtItemsTable tbody tr:nth-child(odd) td {
+    background-color: #bcd8ff !important;
+}
+</style>
+
+
+<script>
+
+$(document).ready(function () {
+    $('#courtItemsTable').DataTable({
+        responsive: true,
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Greek.json"
+        }
+    });
+});
+
+</script>
+
+
+
+<h2>Ιστορικό Παραγγελιών</h2>
+
+<hr>
+
+<table class="table" id="courtItemsTable">
+    <thead>
+        <tr>
+            <th>ID Παραγγελίας</th>
+            <th>Ημερομηνία</th>
+            <th>Κατάσταση</th>
+            <th>Σύνολο</th>
+            <th>Ενέργεια</th>
+        </tr>
+    </thead>
+    <tbody>
+
+           
+        @foreach (OrderModel orderModel in Model)
+        {
+            <tr>
+                <td style="color: #ad0115">@orderModel.ID</td>
+                <td>@orderModel.OrderDate</td>
+                @if (orderModel.Completed == 1)
+                {
+                    <td>Ολοκληρώθηκε</td>
+                }
+                else
+                {
+                    <td>Εκκρεμεί</td>
+
+                }
+
+                <td>@orderModel.TotalCourtPrice&euro;</td>
+                <td><a href="@Url.Action("OrderDetails", "Home",  new { id = orderModel.ID })"><span class='glyphicon glyphicon-info-sign fa-lg' title="Λεπτομέρειες"></span></a></td>
+
+            </tr>
+        }
+            
+            
+    </tbody>
+</table>
+

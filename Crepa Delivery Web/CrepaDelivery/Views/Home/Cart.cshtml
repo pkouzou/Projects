@@ -1,0 +1,105 @@
+﻿@using CrepaDelivery.Models;
+@using CrepaDelivery.Controllers.HelperClasses;
+
+@model List<CourtItem>
+
+
+<style>
+
+    .glyphicon-remove:hover{
+        color: #cc0022;
+        cursor: pointer;
+    }
+
+</style>
+
+<script>
+
+    function deleteCourtItem(courtItemID, r, itemPriceCounter) {
+        var i = r.parentNode.parentNode.rowIndex;
+
+        var totalPrice = $("#totalPrice" + itemPriceCounter).text().replace("\u20ac", "").replace(",", ".");
+        var totalCourtPrice = $("#totalCourtPrice").text().replace("\u20ac", "").replace(",", ".");
+        document.getElementById("courtItemsTable").deleteRow(i);
+        var dataParam = '{"id":"' + courtItemID +'"}';
+        
+        $.ajax({
+            type: "POST",
+            url: '/Home/removeCourtItem',
+            contentType: "application/json; charset=utf-8",
+            data: dataParam,
+            datatype: "json",
+        }).done(function (data) {
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.getResponseHeader("error"));
+        });
+
+        $("#totalCourtPrice").text(((parseFloat(totalCourtPrice) - parseFloat(totalPrice)).toFixed(2) + "\u20ac").replace(".", ","));
+        $("#cartPartialValue").text($("#totalCourtPrice").text());
+
+        if (document.getElementById("courtItemsTable").rows.length == 2){
+            document.getElementById("courtItemsTable").hidden = true;
+            document.getElementById("submitOrder").style.visibility = 'hidden';
+            document.getElementById("courtEmptyMessage").innerHTML = "Το καλάθι σας είναι άδειο";
+        }
+    }
+
+    function doubleToString(totalCourtPrice) {
+        return totalCourtPrice.toFixed(2) + "";
+    }
+
+ </script>
+
+
+@if (Model.Count == 0)
+{
+    <h2>Το καλάθι σας είναι άδειο</h2>
+}
+else
+{
+    <h2 id="courtEmptyMessage"></h2>
+    <div class="table-responsive">
+        <table class="table" id="courtItemsTable">
+            <thead>
+                <tr>
+                    <th>Προϊόν</th>
+                    <th>Τιμή</th>
+                    <th>Ποσότητα</th>
+                    <th>Σύνολο</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    string priceString = "", totalPriceString = "";
+                    double totalCourtPrice = 0;
+                    int i = 0;
+
+                    foreach (CourtItem courtItem in @Model)
+                    {
+                        priceString = HelperClasses.doubleToString(courtItem.Price);
+                        totalPriceString = HelperClasses.doubleToString(courtItem.TotalPrice);
+                        totalCourtPrice += courtItem.TotalPrice;
+
+                    <tr>
+                        <td><b>@courtItem.CrepeSize</b><br/>@courtItem.Ingredients</td>
+                        <td id="@("itemPrice" + i)">@priceString &euro;</td>
+                        <td>@courtItem.Quantity </td>
+                        <td style="color:#cc0022" id="@("totalPrice" + i)">@totalPriceString&euro;</td>
+                        <td><i class="glyphicon glyphicon-remove fa-lg" onclick="deleteCourtItem(@courtItem.ID, this, @i)"/></td>
+                    </tr>
+                    i += 1;
+                    }
+                }
+                <tr>
+                    <td><b style="font-size: 15px">Αξία Καλαθιού</b></td>
+                    <td></td>
+                    <td></td>
+                    <td style="color:#cc0022" id="totalCourtPrice"> @HelperClasses.doubleToString(totalCourtPrice)&euro;</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <input type="button" id="submitOrder" onclick="location.href='@Url.Action("Checkout", "Home")'" value="ΟΛΟΚΛΗΡΩΣΗ ΠΑΡΑΓΓΕΛΙΑΣ" class="btn btn-primary pull-right" />
+
+        </div>
+}

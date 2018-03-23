@@ -1,0 +1,103 @@
+﻿
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+
+            @if (Request.IsAuthenticated)
+            {
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold">@User.Identity.Name</strong>
+                                </span>
+
+                                <span class="text-muted text-xs block">Ο λογαριασμός μου<b class="caret"></b></span>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu fadeInDown m-t-xs">
+
+                            @if (!User.IsInRole("Administrator"))
+                            {
+                                <li><a href="/Home/DeliveryInfo">Στοιχεία Παράδόσης</a></li>
+                                <li><a href="/Home/OrderHistory">Παραγγελίες</a></li>
+                            }
+                            
+                            <li><a href="/Manage/ChangePassword">Αλλαγή Κωδικού</a></li>
+                            <li><a href="javascript:document.getElementById('logoutForm').submit()">Αποσύνδεση</a></li>
+                        </ul>
+                    </div>
+                    <div class="logo-element">
+                        CDA
+                    </div>
+                </li>
+            }
+            else
+            {
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+                        <a href="/Account/MyAccount">
+                            <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold">Δεν είστε συνδεδεμένος/η</strong>
+                                </span>
+
+                                <span class="text-muted text-xs block">Σύνδεση/Εγγραφή<b class="caret"></b></span>
+                            </span>
+                        </a>
+
+                    </div>
+                    <div class="logo-element">
+                        CDA
+                    </div>
+                </li>
+            }
+
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
+            {
+                <li class="@Html.IsSelected(controller:"Orders")">
+                    <a href="@Url.Action("Index", "Orders")"><i class="glyphicon glyphicon-tasks"></i> <span class="nav-label">Παραγγελίες</span> </a>
+                </li>
+                <li class="@Html.IsSelected(controller:"Crepes")">
+                    <a href="@Url.Action("Index", "Crepes")"><i class="glyphicon glyphicon-cutlery"></i> <span class="nav-label">Κρέπες</span> </a>
+                </li>
+                <li class="@Html.IsSelected(controller:"SoftDrink")">
+                    <a href="@Url.Action("Index", "SoftDrink")"><i class="glyphicon glyphicon-glass"></i> <span class="nav-label">Αναψυκτικά</span> </a>
+                </li>
+                <li class="@Html.IsSelected(controller:"Ingredients")">
+                    <a href="@Url.Action("Index", "Ingredients")"><i class="glyphicon glyphicon-leaf"></i> <span class="nav-label">Υλικά</span> </a>
+                </li>
+                <li class="@Html.IsSelected(controller:"CrepeTypes")">
+                    <a href="@Url.Action("Index", "CrepeTypes")"><i class="glyphicon glyphicon-list-alt"></i> <span class="nav-label">Είδη Κρέπας</span> </a>
+                </li>
+                <li class="@Html.IsSelected(controller:"IngredientTypes")">
+                    <a href="@Url.Action("Index", "IngredientTypes")"><i class="glyphicon glyphicon-list"></i> <span class="nav-label">Είδη Συστατικών</span> </a>
+                </li>
+            }
+            else
+            {
+                <li class="@Html.IsSelected(action: "Index")">
+                    <a href="@Url.Action("Index", "Home")"><i class="glyphicon glyphicon-home"></i> <span class="nav-label">Αρχική</span> </a>
+                </li>
+                <li class="@Html.IsSelected(action: "Catalogue")">
+                    <a href="@Url.Action("Catalogue", "Home")"><i class="glyphicon glyphicon-th-list"></i> <span class="nav-label">Ο κατάλογός μας</span></a>
+                </li>
+                @*<li class="@Html.IsSelected(action: "Offers")">
+                    <a href="@Url.Action("Offers", "Home")"><i class="glyphicon glyphicon-gift"></i> <span class="nav-label">Οι προσφορές μας</span></a>
+                </li>*@
+                <li class="@Html.IsSelected(action: "SoftDrinks")">
+                    <a href="@Url.Action("SoftDrinks", "Home")"><i class="glyphicon glyphicon-glass"></i> <span class="nav-label">Αναψυκτικά</span></a>
+                </li>
+                <li class="@Html.IsSelected(action: "Cart")">
+                    <a href="@Url.Action("Cart", "Home")"><i class="glyphicon glyphicon-shopping-cart"></i> <span class="nav-label">Το καλάθι σας</span></a>
+                </li>
+                
+                <li class="@Html.IsSelected(action: "Contact")">
+                    <a href="@Url.Action("Contact", "Home")"><i class="glyphicon glyphicon-phone-alt"></i> <span class="nav-label">Επικοινωνία</span></a>
+                </li>
+            }
+        
+        </ul>
+    </div>
+</nav>

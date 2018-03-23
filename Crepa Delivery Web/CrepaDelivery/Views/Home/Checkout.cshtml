@@ -1,0 +1,106 @@
+﻿@using CrepaDelivery.Models;
+@using CrepaDelivery.Controllers.HelperClasses;
+
+@model CheckoutViewModel
+
+@Scripts.Render("~/bundles/jqueryval")
+
+@using (Html.BeginForm("Checkout", "Home", new {}, FormMethod.Post, new { @class = "form-horizontal", role = "form" })) {
+    
+    <h2>Διεύθυνση Χρέωσης</h2>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-1">
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(m => m.DeliveryInfoViewModelRequired.FirstName, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.DeliveryInfoViewModelRequired.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.DeliveryInfoViewModelRequired.FirstName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DeliveryInfoViewModelRequired.LastName, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.DeliveryInfoViewModelRequired.LastName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.DeliveryInfoViewModelRequired.LastName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DeliveryInfoViewModelRequired.Address, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.DeliveryInfoViewModelRequired.Address, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.DeliveryInfoViewModelRequired.Address, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DeliveryInfoViewModelRequired.Floor, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.DeliveryInfoViewModelRequired.Floor, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.DeliveryInfoViewModelRequired.Floor, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DeliveryInfoViewModelRequired.PhoneNumber, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.DeliveryInfoViewModelRequired.PhoneNumber, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.DeliveryInfoViewModelRequired.PhoneNumber, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+        @*}*@
+
+
+    </div>
+
+    <hr>
+
+    
+
+    <div class="table-responsive">
+        <table class="table" id="courtItemsTable">
+            <thead>
+                <tr>
+                    <th>Προϊόν</th>
+                    <th>Τιμή</th>
+                    <th>Ποσότητα</th>
+                    <th>Σύνολο</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    string priceString = "", totalPriceString = "";
+                    double totalCourtPrice = 0;
+
+                    foreach (CourtItem courtItem in @Model.CourtItems)
+                    {
+                        priceString = HelperClasses.doubleToString(courtItem.Price);
+                        totalPriceString = HelperClasses.doubleToString(courtItem.TotalPrice);
+                        totalCourtPrice += courtItem.TotalPrice;
+
+
+                        <tr>
+                            <td><b>Κρέπα - @courtItem.CrepeSize</b><br />@courtItem.Ingredients</td>
+                            <td>@priceString &euro;</td>
+                            <td>@courtItem.Quantity</td>
+                            <td style="color:#cc0022">@totalPriceString&euro;</td>
+                        </tr>
+                    }
+                }
+                <tr>
+                    <td><b style="font-size: 15px">Αξία Καλαθιού</b></td>
+                    <td></td>
+                    <td></td>
+                    <td style="color:#cc0022">@HelperClasses.doubleToString(totalCourtPrice)&euro;</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <input type="submit" value="ΑΠΟΣΤΟΛΗ ΠΑΡΑΓΓΕΛΙΑΣ"  class="btn btn-primary pull-right" />
+    </div>
+
+</div>
+}

@@ -1,0 +1,132 @@
+﻿@using CrepaDelivery.Models.Helpers;
+@using CrepaDelivery.Models;
+@model CrepaDelivery.Models.Helpers.IngredientViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<style>
+    .dummySelectors{
+        display: none;
+    }
+
+</style>
+
+<html>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/Scripts/bootstrap")
+@Styles.Render("~/Content/css")
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+
+
+    <script>
+
+        function changeIngredientTypes() {
+            $("#ingredientTypes option").remove();
+            var index = $("select[id='crepeCategory'] option:selected").index() - 1;
+            if (index == -1) return;
+            var dummySelector = document.getElementById("ingredientTypes");
+            var options = $("#dummySelector" + index + " option");
+            for (i = 0; i < options.length; i++){
+                dummySelector.append(new Option(options[i].text, options[i].value));
+            }
+        }
+
+    </script>
+</head>
+
+
+<body>
+
+    @using (Html.BeginForm("Create", "Ingredients", new { ingredient = Model.Ingredient }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        IngredientTypeList ingredientTypeList = new IngredientTypeList(Model.IngredientTypes);
+        List<List<SelectListItem>> list = ingredientTypeList.getList();
+        List<string> listLabels = ingredientTypeList.getLabels();
+
+        var crepeTypeList = new List<SelectListItem>();
+
+        foreach (string crepeType in listLabels)
+        {
+            crepeTypeList.Add(new SelectListItem { Text = crepeType, Value = crepeType });
+        }
+
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>Ingredient</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.Ingredient.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Ingredient.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Ingredient.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.Ingredient.CrepeCategory, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.Ingredient.CrepeCategory, crepeTypeList, string.Empty, new { @class = "form-control" , @id = "crepeCategory", @onchange="changeIngredientTypes()"})
+                    @Html.ValidationMessageFor(model => model.Ingredient.CrepeCategory, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+            @for (int i = 0; i < list.Count(); i++)
+            {
+                string selectorID = "dummySelector" + i;
+                <select class="dummySelectors" id=@selectorID>
+                    @for (int j = 0; j < list[i].Count(); j++)
+                    {
+                        <option value=@list[i][j].Value>@list[i][j].Text</option>
+                    }
+
+                </select>
+               }
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Ingredient.IngredientType, htmlAttributes: new { @class = "control-label col-md-2" })
+
+                        <div class="col-md-10">
+                            @Html.DropDownListFor(model => model.Ingredient.IngredientType, new List<SelectListItem>(), string.Empty, new { @class = "form-control", @id = "ingredientTypes"})
+                            @Html.ValidationMessageFor(model => model.Ingredient.IngredientType, "", new { @class = "text-danger" })
+                        </div>
+
+
+                    </div>
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Ingredient.Price, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Ingredient.Price, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Ingredient.Price, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Create" class="btn btn-default" />
+                        </div>
+                    </div>
+</div>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</body>
+
+
+
+</html>

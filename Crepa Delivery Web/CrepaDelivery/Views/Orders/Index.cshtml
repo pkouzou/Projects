@@ -1,0 +1,157 @@
+﻿@using CrepaDelivery.Models;
+@model List<OrderModel>
+
+@Scripts.Render("~/bundles/jquery")
+
+<style>
+
+.panel.with-nav-tabs .panel-heading{
+    padding: 5px;
+}
+.panel.with-nav-tabs .nav-tabs{
+	border-bottom: none;
+}
+.panel.with-nav-tabs .nav-justified{
+	margin-bottom: -1px;
+}
+
+    .with-nav-tabs.panel-primary .nav-tabs > li > a,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
+    color: #fff;
+}
+.with-nav-tabs.panel-primary .nav-tabs > .open > a,
+.with-nav-tabs.panel-primary .nav-tabs > .open > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > .open > a:focus,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
+	color: #fff;
+	background-color: #3071a9;
+	border-color: transparent;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a,
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a:focus {
+	color: #428bca;
+	background-color: #fff;
+	border-color: #428bca;
+	border-bottom-color: transparent;
+}
+
+#with-nav a {
+    display: block;
+    min-height: 100%;
+    padding: 4px 10px;
+    background-color: #222;
+    color: white;
+    border-radius: 6px 6px 0 0;
+}
+
+.orderStatusButton{
+    width: 60%;
+}
+
+
+#myTable tbody tr:nth-child(even) td{
+    background-color: #e3eaf4 !important;
+}
+
+#myTable tbody tr:nth-child(odd) td {
+    background-color: #bcd8ff !important;
+}
+
+</style>
+
+
+<script>
+
+$(document).ready(function () {
+    $('#myTable').DataTable({
+        responsive: true,
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Greek.json"
+        },
+        "order": [[2, "asc" ]]
+    });
+});
+
+function changeOrderStatus(button, orderID, status) {
+    var dataParam = '{"orderID":"' + orderID + '" , "status":"' + status + '"}';
+    var successMessage = "";
+    if (status == '0'){
+        successMessage = "Μετακινήθηκε επιτυχώς στις 'Εκρεμείς'";
+        button.innerHTML = "Ολοκλήρωση";
+        button.className = "btn btn-primary orderStatusButton";
+        button.onclick = function () { changeOrderStatus(button, orderID, 1); };
+        document.getElementById("status" + orderID).innerHTML = "Εκκρεμεί";
+    }
+    else{
+        successMessage = "Μετακινήθηκε επιτυχώς στις 'Ολοκληρωμένες'";
+        button.innerHTML = "Αναίρεση";
+        button.className = "btn btn-danger orderStatusButton";
+        button.onclick = function () { changeOrderStatus(button, orderID, 0); };
+        document.getElementById("status" + orderID).innerHTML = "Ολοκληρώθηκε";
+    }
+
+    $.ajax({
+        type: "POST",
+        url: '/Orders/changeOrderStatus',
+        contentType: "application/json; charset=utf-8",
+        data: dataParam,
+        datatype: "json",
+    }).done(function (data) {
+        //alert(successMessage);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.getResponseHeader("error"));
+    });
+
+}
+
+</script>
+
+
+<h2>Παραγγελίες</h2>
+
+
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th>ID Παραγγελίας</th>
+            <th>Ημερομηνία</th>
+            <th>Κατάσταση</th>
+            <th>Ενέργεια</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (OrderModel orderModel in Model)
+        {
+            <tr>
+                <td style="color: #ad0115">@orderModel.ID</td>
+                <td>@orderModel.OrderDate</td>
+                @if (orderModel.Completed == 1)
+                {
+                    <td id="@("status" + orderModel.ID)">Ολοκληρώθηκε</td>
+                }
+                else
+                {
+                    <td id="@("status" + orderModel.ID)">Εκκρεμεί</td>
+
+                }
+
+                <td>@Html.ActionLink("Εμφάνισε", "", "")</td>
+
+                @if (orderModel.Completed == 1)
+                {
+                    <td><button class="btn btn-danger orderStatusButton" onclick="changeOrderStatus(this, @orderModel.ID, 0)">Αναίρεση</button></td>
+                }
+                else
+                {
+                    <td><button class="btn btn-primary orderStatusButton" onclick="changeOrderStatus(this, @orderModel.ID, 1)">Ολοκλήρωση</button></td>
+                }
+
+            </tr>
+        }
+
+    </tbody>
+</table>

@@ -1,0 +1,21 @@
+﻿@using CrepaDelivery.Controllers.HelperClasses;
+@using Microsoft.AspNet.Identity
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-top-links navbar-right">
+            @if (!User.IsInRole("Administrator"))
+            {
+                <li>
+                    <a href="/Home/Cart">
+                        <i class="glyphicon glyphicon-shopping-cart"></i> <span id="cartPartialValue">@HelperClasses.getCartValueString(User.Identity.Name)&euro;</span>
+                    </a>
+
+                </li>
+            }
+        </ul>
+    }
+}

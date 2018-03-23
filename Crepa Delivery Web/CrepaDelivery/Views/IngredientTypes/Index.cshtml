@@ -1,0 +1,64 @@
+﻿@model IEnumerable<CrepaDelivery.Models.IngredientType>
+
+
+<style>
+    #myTable tbody tr:nth-child(even) td {
+        background-color: #e3eaf4 !important;
+    }
+
+    #myTable tbody tr:nth-child(odd) td {
+        background-color: #bcd8ff !important;
+    }
+</style>
+
+@Scripts.Render("~/bundles/jquery")
+
+<script>
+
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Greek.json"
+            }
+        });
+    });
+
+</script>
+
+<a href="@Url.Action("Create", "IngredientTypes")" class="pull-right"><span class='glyphicon glyphicon-plus-sign fa-lg'></span>Προσθήκη τύπου συστατικού</a>
+
+<hr />
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CrepeCategory)
+            </th>
+            <th>
+                Ενέργεια
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CrepeCategory)
+                </td>
+               
+                <td>
+                    <a href="@Url.Action("Delete", "IngredientTypes",  new { id = item.Type })"><span class='glyphicon glyphicon-trash fa-lg' title="Διαγραφή"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>

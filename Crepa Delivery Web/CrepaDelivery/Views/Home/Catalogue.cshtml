@@ -1,0 +1,110 @@
+﻿@model List<CrepaDelivery.Models.Crepe>
+
+@{
+    ViewBag.Title = "Catalogue";
+}
+
+<style>
+
+   hr.style2 {
+	    border-top: 3px double #d1d1d1;
+   }
+
+   .addCourtStyle:hover{
+       color: #e88e61;
+       cursor: pointer;
+   }
+   .thumbnail{
+       width: 100%;
+       height: 100%;
+   }
+
+    .col-xs-18, col-sm-6, col-md-3{
+        padding-top: 20px;
+        box-shadow: 5px 5px 3px #888888;
+    }
+
+    .col-xs-18:hover, col-sm-6:hover, col-md-3:hover{
+        padding-top: 20px;
+        box-shadow: 5px 5px 3px #b2aeaf;
+    }
+
+</style>
+
+
+<script>
+
+    function addFromCatalogueToCourt(crepeID, ingredientString, crepeSize, price) {
+        if (@User.Identity.IsAuthenticated.ToString().ToLower() == false){
+            showToast("Πρέπει να συνδεθείτε πρώτα");
+            return;
+        }
+
+        //alert(ingredientString + " " + crepeSize + " " + price);
+        var dataParam = '{"ingredientsToString":"[' + crepeID + ': ' + ingredientString + ']", "crepeSize":"Κρέπα - ' + crepeSize + '", "price":"' + price + '", "quantity":"1"}';
+
+
+        $.ajax({
+            type: "POST",
+            url: '/Home/addItemToCourt',
+            contentType: "application/json; charset=utf-8",
+            data: dataParam,
+            datatype: "json",
+        }).done(function (data) {
+            updatePartialCartValue();
+            showToast("Προστέθηκε επιτυχώς στο καλάθι σας")
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            showToast("Η προσθήκη στο καλάθι απέτυχε");
+        });
+    }
+
+    function updatePartialCartValue(){
+        var dataParam = '{}';
+
+        $.ajax({
+            type: "POST",
+            url: '/Home/getPartialCartValue',
+            contentType: "application/json; charset=utf-8",
+            data: dataParam,
+            datatype: "json",
+        }).done(function (data) {
+            $("#cartPartialValue").text(data+"\u20ac");
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            showToast("Η ανανέωση του καλαθιού απέτυχε");
+        });
+    
+    }
+
+</script>
+
+@foreach (CrepaDelivery.Models.Crepe crepe in Model)
+{
+    <div class="col-xs-18 col-sm-6 col-md-4">
+        <div class="thumbnail">
+            <div class="caption">
+                <h3>@crepe.ID</h3>
+                <p>@crepe.Ingredients</p>
+                <hr class="style2">
+                <div class="row">
+                    <div class="col-md-6 addCourtStyle" style="text-align:center" onclick="addFromCatalogueToCourt(@crepe.ID, '@crepe.Ingredients', 'Κανονικό Μέγεθος', @crepe.NormalPrice)">
+                        <h5>Προσθήκη στο καλάθι</h5>
+                        <h4><b>Κανονικό μέγεθος</b></h4>
+                        <span style="color:#cc0022">@CrepaDelivery.Controllers.HelperClasses.HelperClasses.doubleToString(@crepe.NormalPrice)&euro;</span>
+                    </div>
+                    <div class="col-md-6 addCourtStyle" style="text-align:center" onclick="addFromCatalogueToCourt(@crepe.ID, '@crepe.Ingredients', 'XL Μέγεθος', @crepe.XLPrice)">
+                        <h5>Προσθήκη στο καλάθι</h5>
+                        <h4><b>XL μέγεθος</b></h4>
+                        <span style="color:#cc0022">@CrepaDelivery.Controllers.HelperClasses.HelperClasses.doubleToString(@crepe.XLPrice)&euro;</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+<div id="snackbar"></div>
+
+
+

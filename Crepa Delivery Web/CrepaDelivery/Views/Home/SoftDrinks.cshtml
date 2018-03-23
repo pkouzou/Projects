@@ -1,0 +1,134 @@
+﻿@using CrepaDelivery.Models;
+@using CrepaDelivery.Controllers.HelperClasses;
+@model List<SoftDrink>
+
+
+@{
+    ViewBag.Title = "Αναψυκτικά";
+}
+
+
+<style>
+    .img-responsive{
+        width: 250px;
+        height: 250px;
+    }
+</style>
+
+<style>
+   
+    .thumbnail {
+        padding: 0;
+    }
+
+    .col-xs-18, col-sm-6, col-md-3{
+        padding-top: 20px;
+        box-shadow: 6px 6px 3px #888888;
+    }
+
+    .col-xs-18:hover, col-sm-6:hover, col-md-3:hover{
+        padding-top: 20px;
+        box-shadow: 6px 6px 3px #b2aeaf;
+    }
+
+    .caption{
+        text-align: center;
+    }
+
+    .customA{
+        color:black;
+        text-align: center;
+    }
+
+
+    .customA:hover{
+        text-decoration: none;
+        color: #bf001f;
+    }
+
+</style>
+
+<script>
+
+    function addToCourt(name, textID, price) {
+        if (@User.Identity.IsAuthenticated.ToString().ToLower() == false){
+            showToast("Πρέπει να συνδεθείτε πρώτα")
+            return;
+        }
+
+        var quantity = $("#"+textID).val();
+
+        if (!quantity || quantity==="0"){
+            showToast("Η ποσότητα πρέπει να είναι τουλάχιστον 1");
+            return;
+        }
+
+        var dataParam = '{"ingredientsToString":"", "crepeSize":"' + name + '", "price":"' + price + '", "quantity":"' + quantity +'"}'; 
+       
+        $.ajax({
+            type: "POST",
+            url: '/Home/addItemToCourt',
+            contentType: "application/json; charset=utf-8",
+            data: dataParam,
+            datatype: "json",
+        }).done(function (data) {
+            updatePartialCartValue();
+            showToast("Προστέθηκε επιτυχώς στο καλάθι σας");
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            showToast("Η προσθήκη στο καλάθι απέτυχε");
+        });
+    }
+
+    function updatePartialCartValue(){
+        var dataParam = '{}';
+
+        $.ajax({
+            type: "POST",
+            url: '/Home/getPartialCartValue',
+            contentType: "application/json; charset=utf-8",
+            data: dataParam,
+            datatype: "json",
+        }).done(function (data) {
+            $("#cartPartialValue").text(data+"\u20ac");
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            showToast("Η ανανέωση του καλαθιού απέτυχε");
+        });
+    
+    }
+
+</script>
+
+<h2>Αναψυκτικά</h2>
+<div class="container">
+    <div class="row">
+        @{ 
+            int counter = 0;
+            string textID = "";
+        }
+       
+        @foreach (SoftDrink softDrink in Model)
+        {
+            textID = "softDrink" + counter;
+            <div class="col-xs-18 col-sm-6 col-md-3">
+                <div class="thumbnail">
+                    <img src="@softDrink.ImagePath">
+                    <div class="caption">
+                        <h3>@softDrink.Name</h3>
+                        <h4 style="color:#cc0022; padding:5px;">@HelperClasses.doubleToString(@softDrink.Price)&euro;</h4>
+
+                        Ποσότητα
+                        <input type="text" id="@textID" value="1" maxlength="2" size="1" style="text-align: center" onkeypress='return event.charCode >= 48 && event.charCode <= 57'/>
+                        <hr />
+                        <i class="glyphicon glyphicon-shopping-cart"></i>
+                        <a onclick="addToCourt('@softDrink.Name', '@textID', @softDrink.Price)" class="customA">Προσθήκη στο καλάθι</a>
+                    </div>
+                </div>
+            </div>
+
+            counter += 1;
+        }
+
+    </div>
+</div>
+
+<div id="snackbar"></div>

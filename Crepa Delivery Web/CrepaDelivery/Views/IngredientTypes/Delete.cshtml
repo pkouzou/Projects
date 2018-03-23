@@ -1,0 +1,31 @@
+﻿@model CrepaDelivery.Models.IngredientType
+
+<h3>Είστε σίγουροι ότι θέλετε να διαγράψετε τον τρέχοντα τύπο συστατικού;</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CrepeCategory)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CrepeCategory)
+        </dd>
+    </dl>
+    
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+    
+        <div class="form-actions no-color">
+            @Html.ActionLink("Πίσω στην λίστα", "Index") | 
+            <input type="submit" value="Διαγραφή" class="btn btn-danger" />
+        </div>
+    }
+</div>

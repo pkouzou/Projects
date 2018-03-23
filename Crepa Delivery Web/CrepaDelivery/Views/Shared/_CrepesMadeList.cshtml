@@ -1,0 +1,393 @@
+﻿
+<style>
+    .ingredientColumn {
+        border-radius: 20px !important;
+        background-color: #369 !important;
+        color: white;
+        border: 4px solid white;
+    }
+
+    th{
+        text-align: center !important;
+    }
+    td:not([class="ingredientColumn"]){
+        text-align: center !important;
+    }
+
+    .big-checkbox {width: 30px; height: 30px;}
+
+    .ingredientComponent{
+        background-color: #e5e5e5;
+        border-radius: 20px;
+        color: black;
+        padding: 9px;
+        margin: 2px;
+        display: inline-block;
+        text-align: right;
+    }
+
+    #removeIngredient{
+        border: none;
+        background-color: none;
+    }
+
+    #removeIngredient:focus{
+        border: none;
+    }
+
+    .glyphicon-remove-sign{
+        color: #ff354d;
+    }
+
+    .glyphicon-remove-sign:hover{
+        color: #ffa647;
+        cursor: pointer;
+    }
+   
+    .glyphicon-trash{
+        color: black;
+    }
+
+    .glyphicon-trash:hover{
+        color: #44392e;
+        cursor: pointer;
+    }
+
+    .crepeCost{
+        background-color: #e5e5e5;
+        border-radius: 20px;
+        color: #0643a5;
+        padding: 5px;
+        width: auto;
+        float: right;
+    }
+
+    input[type=text]{
+        text-align: center;
+    }
+
+    .btn-label {position: relative;left: -12px;display: inline-block;padding: 6px 12px;background: rgba(0,0,0,0.15);border-radius: 3px 0 0 3px;}
+    .btn-labeled {
+        background-color: rgb(26, 179, 148);
+        color: white;
+        padding-top: 0;padding-bottom: 0;
+    }
+    .btn { margin-bottom:10px; }
+
+    .btn-success{
+        background-color: #369;
+    }
+
+</style>
+
+<script>
+
+    var availableDeletedIDS = {}
+    var counter = 0;
+    var currentID = 0;
+    var currentIDCounter = 0;
+    var lastRadioButtonChecked = "";
+    //variables for crepe dictionary
+    var currentCrepesMade = {};
+
+    function addToCourt() {
+        if (@User.Identity.IsAuthenticated.ToString().ToLower() == false){
+            showToast('Πρέπει να συνδεθείτε πρώτα')
+            return;
+        }
+
+        //alert($("#quantity"+lastRadioButtonChecked.split("_")[1]).val());
+        var crepeID = "crepeOrder" + lastRadioButtonChecked.split("_")[1];
+        var quantity = $("#quantity" + lastRadioButtonChecked.split("_")[1]).val();
+
+        var dataParam = '{"ingredientsToString":"' + currentCrepesMade[crepeID].ingredientsToString() + '", "crepeSize":"Κρέπα - ' + currentCrepesMade[crepeID].crepeSizeToString() + '", "price":"' + currentCrepesMade[crepeID].getPrice() + '", "quantity":"' + quantity +'"}';
+
+        $.ajax({
+            type: "POST",
+            url: '/Home/addItemToCourt',
+            contentType: "application/json; charset=utf-8",
+            data: dataParam,
+            datatype: "json",
+        }).done(function (data) {
+            updatePartialCartValue();
+            showToast('Προστέθηκε επιτυχώς στο καλάθι σας')
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.getResponseHeader("error"));
+        });
+    }
+
+    function updatePartialCartValue(){
+        var dataParam = '{}';
+
+        $.ajax({
+            type: "POST",
+            url: '/Home/getPartialCartValue',
+            contentType: "application/json; charset=utf-8",
+            data: dataParam,
+            datatype: "json",
+        }).done(function (data) {
+            $("#cartPartialValue").text(data+"\u20ac");
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.getResponseHeader("error"));
+        });
+    }
+
+    function addCrepeToDictionary(crepeID) {
+        currentCrepesMade[crepeID] = new CrepeDictionary();
+    }
+
+    function removeCrepeFromDictionary(crepeID) {
+        delete currentCrepesMade[crepeID];
+    }
+
+    function onXLChange(crepeIDCounter){
+        currentCrepesMade["crepeOrder" + crepeIDCounter].changeXL();
+        document.getElementById("price" + crepeIDCounter).innerHTML =  currentCrepesMade["crepeOrder" + crepeIDCounter].getPrice() + "&#8364";
+    }
+
+    function addIngredientToCrepe(crepeCounter, ingredientName, ingredientPrice) {
+        var ingredientNameFront = ingredientName;
+        ingredientName = ingredientName.replace(" ", "");
+        var crepeID = "crepeOrder" + crepeCounter;
+        currentCrepesMade[crepeID].addIngredient(ingredientName, ingredientNameFront, ingredientPrice);
+        var price = Math.round(currentCrepesMade[crepeID].getPrice() * 100) / 100;
+        var priceID = "price" + crepeCounter;
+        document.getElementById(priceID).innerHTML = price.toFixed(2) + "&#8364";
+        var ingredientComponent = document.getElementById("ingredientComponent" + crepeCounter);
+
+        var quantity = currentCrepesMade[crepeID].ingredientDictionary[ingredientName];
+
+        if (quantity == 1) {
+            newDiv = document.createElement('div');
+            newDiv.id = "ingredient" + ingredientName + crepeCounter;
+            price = currentCrepesMade[crepeID].getingredientDictionary()[ingredientName] * ingredientPrice;
+            price = (Math.round(price * 100) / 100).toFixed(2);
+            newDiv.className = "ingredientComponent";
+            newDiv.innerHTML = '<i class="glyphicon glyphicon-remove-sign fa-lg" id="ingredientRemove' + "ingredient" + ingredientName + crepeCounter + '" onclick="removeIngredientFromCrepe(`' + crepeCounter + '`, `' + newDiv.id + '`, `' + priceID + '`, `' + ingredientName + '`, `' + ingredientPrice + '`)"></i>' + ingredientNameFront;
+            ingredientComponent.appendChild(newDiv);
+        }
+        else if (quantity > 1) {
+            ingredientPrice *= quantity;
+            document.getElementById("ingredient" + ingredientName + crepeCounter).innerHTML = '<i class="glyphicon glyphicon-remove-sign fa-lg" id="ingredientRemove' + "ingredient" + ingredientName + crepeCounter + '" onclick="removeIngredientFromCrepe(`' + crepeCounter + '`, `' + "ingredient" + ingredientName + crepeCounter + '`, `' + priceID + '`, `' + ingredientName + '`, `' + ingredientPrice + '`)"></i>' + ingredientNameFront + "<b> x" + quantity;
+        }
+        else {
+            document.getElementById("ingredient" + ingredientName + crepeCounter).innerHTML = '<i class="glyphicon glyphicon-remove-sign fa-lg" id="ingredientRemove' + "ingredient" + ingredientName + crepeCounter + '" onclick="removeIngredientFromCrepe(`' + crepeCounter + '`, `' + "ingredient" + ingredientName + crepeCounter + '`, `' + priceID + '`, `' + ingredientName + '`, `' + ingredientPrice + '`)"></i>' + ingredientNameFront;
+            currentCrepesMade[crepeID].setValue(ingredientName, 1);
+            $('.ingredientComponent[id="' + "ingredient" + ingredientName + crepeCounter + '"]').show();
+        }
+    }
+
+    function removeIngredientFromCrepe(crepeCounter, divToRemoveID, priceID, ingredientName, price) {
+        var crepeID = "crepeOrder" + crepeCounter;
+        if ($("#" + divToRemoveID) == null) {
+            alert("null");
+        }
+        $("#" + divToRemoveID).hide();
+        currentCrepesMade[crepeID].changePrice(price);
+        document.getElementById(priceID).innerHTML = currentCrepesMade[crepeID].getPrice().toFixed(2) + "&#8364";
+        currentCrepesMade[crepeID].resetQuantity(ingredientName);
+    }
+
+    function updateLastRadioButtonChecked(radioButton) {
+        lastRadioButtonChecked = radioButton.id;
+    }
+
+    function addCrepeOrder() {
+
+        if (Object.keys(availableDeletedIDS).length == 0) {
+            counter += 1;
+            currentID = "crepeOrder" + counter;
+            currentIDCounter = counter;
+
+        }
+        else {
+            for (key in availableDeletedIDS) {
+                currentID = key;
+                currentIDCounter = availableDeletedIDS[key];
+            }
+
+            delete availableDeletedIDS[currentID];
+        }
+        addCrepeToDictionary(currentID);
+        var localIDCounter = currentIDCounter;
+        var table = document.getElementById("crepeOrders");
+        var row = table.insertRow(table.rows.length);
+        row.id = currentID;
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+        var radioButtonID = "radioButton_" + currentIDCounter;
+        lastRadioButtonChecked = radioButtonID;
+        cell1.innerHTML = '<label><input type="radio" id="' + radioButtonID + '" name="optradio" class="big-checkbox" checked="checked" onclick="updateLastRadioButtonChecked(this)"></label>';
+        cell2.className = "ingredientColumn";
+        cell2.id = "ingredientComponent" + currentIDCounter;
+        cell2.innerHTML = ` <div class="ingredientComponent" id="ingredientComponent` + currentIDCounter + `">
+                            Ζύμη κρέπας
+                        </div>
+
+                        <span class="crepeCost" id="price`+ currentIDCounter +`">2.20&euro;</span>`;
+        cell3.innerHTML = '<label><input type="checkbox" class="big-checkbox" id="checkbox' + currentIDCounter + '" onchange="onXLChange(' + currentIDCounter +')"></label>';
+        cell4.innerHTML = ` <div class="input-group">
+                                <span class ="input-group-btn">
+
+                                    <button class ="btn btn-success" type="button" name= "` + currentIDCounter + `" onclick="updateQuantity(this,-1)">-</button>
+                                </span>
+
+                                <input type="text" id="quantity` + currentIDCounter + `"class="form-control" value="1" maxlength="2" size="1" onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="quantity` + currentIDCounter + `">
+                                <span class="input-group-btn">
+                                    <button class = "btn btn-success" type="button" name="` + currentIDCounter + `" onclick="updateQuantity(this, 1)">+</button>
+                                </span>
+                            </div>`;
+        cell5.innerHTML = '<i class="glyphicon glyphicon-trash fa-lg" onclick="deleteRow(' + currentIDCounter + ')"/>';
+
+        $('#addCourtButton').removeAttr('disabled');
+    }
+
+
+    function deleteRow(rowID) {
+
+        var row = document.getElementById("crepeOrder" + rowID);
+        removeCrepeFromDictionary("crepeOrder" + rowID);
+       
+        row.parentNode.removeChild(row);
+        availableDeletedIDS["crepeOrder" + rowID] = rowID;
+        refreshRadioButtonSelection();
+        if(lastRadioButtonChecked == ""){
+            $('#addCourtButton').attr('disabled', 'disabled');
+        }
+    }
+
+    function refreshRadioButtonSelection() {
+        var radioButtons = document.getElementsByName("optradio");
+
+        if (radioButtons.length == 0) {
+            lastRadioButtonChecked = "";
+            return;
+        }
+        var i;
+        for (i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].checked) return;
+        }
+
+        radioButtons[0].checked = "checked";
+        lastRadioButtonChecked = radioButtons[0].id;
+    }
+
+    function updateQuantity(button, step) {
+
+        var quantity = document.getElementById("quantity" + button.name);
+
+        step = parseInt(step);
+
+        if (quantity == null) {
+            alert("null");
+        }
+
+        if (quantity.value === "") quantity.value = 1;
+        var val = parseInt(quantity.value);
+        if (val == 1 && step < 0) return;
+
+        quantity.value = val + step;
+        currentCrepesMade["crepeOrder" + lastRadioButtonChecked.split("_")[1]].setQuantity(val + step);
+
+    }
+
+    function showToast(message) {
+        var x = document.getElementById("snackbar")
+        x.innerHTML = message;
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+</script>
+
+
+<div class="table-responsive">
+    <table class="table col-sm-12 table-bordered table-striped table-condensed cf" id="crepeOrders">
+        <colgroup>
+            <col class="col-md-1">
+            <col class="col-md-8">
+            <col class="col-md-1">
+            <col class="col-md-2">
+            <col class="col-md-1">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Επιλ.</th>
+                <th id="ingredients">Υλικά</th>
+                <th>XL</th>
+                <th>Ποσότητα</th>
+                <th>Διαγρ.</th> 
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < 0; i++)
+            {
+                <tr>
+                    <td>
+                        <label><input type="radio" name="optradio" class="big-checkbox" checked="checked"></label>
+
+                    </td>
+
+                    <td class="ingredientColumn" id="ingredients">
+
+                        <div class="ingredientComponent">
+                            Ζύμη κρέπας
+                        </div>
+
+                        <div class="ingredientComponent">
+                            <i class="glyphicon glyphicon-remove-sign fa-lg"></i>
+                             Τυροσαλάτα
+                        </div>
+
+                        <span class="crepeCost">2.50&euro;</span>
+
+                    </td>
+                    <td>
+                         <label><input type="checkbox" class="big-checkbox"></label>
+                    </td>
+                    <td>
+
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button class="btn btn-success" type="button">-</button>
+                            </span>
+                            <input type="text" id="quantity" class="form-control" value="0" maxlength="2" size="1" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                            <span class="input-group-btn">
+                                <button class="btn btn-success" type="button">+</button>
+                            </span>
+                        </div>
+
+
+</td>
+                    <td><i class="glyphicon glyphicon-trash fa-lg"/></td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<td style="position:center">
+
+<script>
+    addCrepeOrder();
+</script>
+
+
+<button onclick="addCrepeOrder()" type="button" class="btn btn-labeled">
+    <span class="btn-label"><i class="glyphicon glyphicon-plus"></i></span>Νέα Κρέπα
+</button>
+
+
+
+
+<button onclick="addToCourt()" type="button" class="btn btn-labeled pull-right">
+    <span class="btn-label"><i class="glyphicon glyphicon-shopping-cart"></i></span>Προσθήκη στο καλάθι
+</button>
+
+
+<hr>
+
+<div id="snackbar"></div>

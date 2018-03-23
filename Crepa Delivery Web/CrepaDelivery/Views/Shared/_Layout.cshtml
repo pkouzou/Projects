@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+
+@{ 
+    ViewBag.Title = "Crepa Delivery";
+}
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Titles</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/dataTable")
+    @Styles.Render("~/font-awesome/css")
+
+</head>
+<body>
+    <!-- Wrapper-->
+    <div id="wrapper">
+        <!-- Navigation -->
+        @Html.Partial("_Navigation")
+        <!-- Page wraper -->
+        <div id="page-wrapper" class="gray-bg">
+            <!-- Top Navbar -->
+            @Html.Partial("_TopNavbar")
+            <!-- Main view  -->
+            @RenderBody()
+            <!-- Footer -->
+            @*@if (!User.IsInRole("Administrator"))
+            {
+                @Html.Partial("_Footer")
+            }*@
+        </div>
+        <!-- End page wrapper-->
+    </div>
+    <!-- End wrapper-->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/plugins/metsiMenu")
+    @Scripts.Render("~/plugins/pace")
+    @Scripts.Render("~/plugins/slimScroll")
+    @Scripts.Render("~/bundles/inspinia")
+    @Scripts.Render("~/bundles/dataTable")
+    @Scripts.Render("~/bundles/toast")
+    @*@Scripts.Render("~/bundles/CrepeDictionary")*@
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>
