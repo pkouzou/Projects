@@ -138,7 +138,7 @@ public class SearchFiles {
 	  PrintWriter writer;
 	  File file;
 	  String field = "", counter = "", line;
-	  String path = "C:\\Users\\Chryssa\\Documents\\cse\\8osemester\\anakthshPlhroforias\\project\\splitTweetWithTabs\\recommendations\\";
+	  String path = "";
 	  try {
 		file = new File(path + fileName + ".txt");
 		br = new BufferedReader(new FileReader(file));
