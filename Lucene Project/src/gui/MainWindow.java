@@ -40,7 +40,7 @@ import java.util.Arrays;
 
 public class MainWindow {
 
-	private String recommendationPath = "C:\\Users\\Chryssa\\Documents\\cse\\8osemester\\anakthshPlhroforias\\project\\splitTweetWithTabs\\recommendations\\";
+	private String recommendationPath = "";
 	private JFrame frame;
 	private FormLayout formLayout = new FormLayout();
 	private BorderLayout borderLayout = new BorderLayout();
