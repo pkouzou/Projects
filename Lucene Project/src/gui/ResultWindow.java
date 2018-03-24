@@ -52,8 +52,8 @@ import utils.HitComparator;
 import utils.SearchReturn;
 
 public class ResultWindow extends JFrame{
-	private String historyPath = "C:\\Users\\Chryssa\\Documents\\cse\\8osemester\\anakthshPlhroforias\\project\\splitTweetWithTabs\\history\\";  
-	private String indexPath = "C:\\Users\\Chryssa\\Documents\\cse\\8osemester\\anakthshPlhroforias\\project\\splitTweetWithTabs\\indexes";
+	private String historyPath = "";  
+	private String indexPath = "";
 	private JPanel topPanel;
 	private JPanel bottomPanel;
 	private JPanel panel;
