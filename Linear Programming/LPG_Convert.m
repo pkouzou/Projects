@@ -22,7 +22,7 @@ function LPG_Convert(c, A, a, B, b, J)
     B = [B, -B(:,unsigned_vars)];
     c = [c, -c(:,unsigned_vars)];
     
-    %convert into inequetion program
+    %convert into inequation program
     tempB = [B;A;-A];
     tempb = [b,a,-a];
     
